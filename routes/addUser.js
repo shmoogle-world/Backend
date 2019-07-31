@@ -4,11 +4,30 @@ const fs = require("fs");
 const axios = require("axios");
 const SENDGRID_BEARER = process.env.APPSETTING_SENDGRID_BEARER;
 const SENDGRID_LIST_ID = process.env.APPSETTING_SENDGRID_LIST_ID;
+const gsheet = require('google-spreadsheet');
+const {promisify} = require('util');
+const creds = require('./client_creds.json');
+
 /* {
     "id": ******,
     "name": "shmoogleUsers",
     "recipient_count": 0
 } */
+
+var addUser = async function InsertData(email, date){
+    const doc = new gsheet('1AU_LoyKsSAGPWuJXgRcv3oyfUtLJaBkaLLSe4N6rO30');
+    await promisify(doc.useServiceAccountAuth)(creds);
+    const info = await promisify(doc.getInfo)();
+    const sheet = info.worksheets[0];
+
+    const row = {
+        Email : email,
+        Time : date
+    }
+
+    await promisify(sheet.addRow)(row);
+};
+
 
 /* post  add new user to local json file and to sendgrid API*/
 router.post("/", function(req, res) {
@@ -42,6 +61,10 @@ router.post("/", function(req, res) {
           }
         )
         .then(response => {
+          let now = new Date();
+          let date = now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate()+"\t"+now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+          addUser(email,date);
+
           fs.readFile("./sendGrid/users.json", (err, data) => {
             var json = JSON.parse(data);
             console.log(json);
@@ -67,4 +90,6 @@ router.post("/", function(req, res) {
     });
 });
 
+
 module.exports = router;
+

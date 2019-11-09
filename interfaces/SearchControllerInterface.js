@@ -1,59 +1,70 @@
-import * as ControllerInterface from './ControllerInterface';
+const ControllerInterface = require('./ControllerInterface');
+const axios = require("axios");
 
-export class SearchControllerInterface extends ControllerInterface {
+class SearchControllerInterface extends ControllerInterface {
 
     /**
      * Fetches 100 search results from the bing api.
      * 
      * @param {string} searchQuery
      */
-    search(searchQuery) { 
-        return new Promise((resolve, reject) => {
-            let resultArray = {};
-            for (let i = 0; i < 2; i++) {
-                resultArray.push(...await this._fetchQuery(searchQuery, i * 50));
-            }
-            resolve(this._parseResult(resultArray));
+    search(searchQuery) {
+        let self = this;
+        return new Promise(function (resolve, reject) {
+            Promise.all([
+                self.fetchQuery(searchQuery),
+                self.fetchQuery(searchQuery, 50)
+            ]).then(responseArray =>
+                resolve(self.parseResult(responseArray))
+            );
         });
     };
 
     /**
      * Fetches a search query from the bing api.
      * 
-     * @param {string} searchQuery Search query to lookup
-     * @param {number} offset Query offset
+     * @param {string} queryArray Search query to lookup
      */
-    async _fetchQuery(searchQuery, offset = 0) {
-        
-        const axios = require("axios");
+    fetchQuery(query, offset = 0) {
         const SUBSCRIPTION_KEY = process.env.APPSETTING_SUBSCRIPTION_KEY;
+
         if (!SUBSCRIPTION_KEY) {
             throw new Error("AZURE_SUBSCRIPTION_KEY is not set.");
         }
 
-        return await axios.get("https://api.cognitive.microsoft.com/bing/v7.0/search", {
-            params: {
-                "q": encodeURIComponent(searchQuery),
-                "count": 50,
-                "offset": offset
-            },
-            headers: { "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY}
+        var _query = {
+            url: "https://api.cognitive.microsoft.com/bing/v7.0/search?q=",
+            query: encodeURIComponent(query) + "&count=50&offset=",
+            headers: {
+                "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY
+            }
+        };
+
+        return axios.get(_query.url + _query.query + offset, {
+            headers: _query.headers
         });
     };
-    
+
 
     /**
      * Parses the bing response to be more useful.
      * 
      * @param {*} responseArray array of bing responses
      */
-    _parseResult(responseArray) {
+    parseResult(responseArray) {
         let resultIndexCounter = 0;
+        let resultArray = [];
 
-        responseArray.data.webPages.value
-            .forEach(item => 
-                        item.originalResultIndex = resultIndexCounter++
-                    );
-        return responseArray.data.webPages.value;
+        responseArray.forEach(element => {
+            element.data.webPages.value
+                .forEach(item => {
+                    item.originalResultIndex = resultIndexCounter++;
+                    resultArray.push(item);
+                });
+        })
+
+        return resultArray;
     };
 }
+
+module.exports = SearchControllerInterface;

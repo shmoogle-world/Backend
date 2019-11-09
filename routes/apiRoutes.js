@@ -10,8 +10,14 @@ const SearchController = new (require('../controllers/api/SearchController'));
 /**
  * Shmoogle Search routes
  */
-router.get("search/:query/unshuffled", SearchController.unshuffled);
-router.get("search/:query/shuffled", SearchController.shuffled);
-router.get("search/:query", SearchController.index);
+router.get("/search/:query/unshuffled", (req, res) => {
+    SearchController.unshuffled(req, res);
+});
+router.get("/search/:query/shuffled", (req, res) => {
+    SearchController.shuffled(req, res);
+});
+router.get("/search/:query", (req, res) => {
+    SearchController.index(req, res);
+});
 
 module.exports = router;

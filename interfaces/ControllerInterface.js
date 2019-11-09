@@ -1,4 +1,4 @@
-export class Controller {
+class Controller {
     index() {
 
     }
@@ -15,3 +15,5 @@ export class Controller {
 
     }
 }
+
+module.exports = Controller;

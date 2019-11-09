@@ -1,7 +1,6 @@
-import * as Controller from '../../interfaces/SearchControllerInterface';
-import { Response, Request } from "express-serve-static-core";
+const SearchControllerInterface = require('../../interfaces/SearchControllerInterface');
 
-export class SearchController extends Controller{
+class SearchController extends SearchControllerInterface {
     
     /**
      * returns an array containing both shuffled and unshuffled results
@@ -27,13 +26,14 @@ export class SearchController extends Controller{
      *       200:
      *         description: Successfully returns a json containing 100 search results both shuffled and unshuffled.
      */
-    index(req, res) {
+    async index(req, res) {
         try {
             let query = this.validateInput(req, res);
             const _ = require("underscore");
+            let queryResponse = await this.search(query);
             res.json([
-                this.search(query),
-                _.shuffle(this.search(query)),
+                queryResponse,
+                _.shuffle(queryResponse),
             ]);
         } catch(error) {
             console.log(error);
@@ -64,10 +64,10 @@ export class SearchController extends Controller{
      *       200:
      *         description: Successfully returns a json containing 100 search results.
      */
-    unshuffled(req, res) {
+    async unshuffled(req, res) {
         try {
             let query = this.validateInput(req, res);
-            res.json(this.search(query));
+            res.json(await this.search(query));
         } catch(error) {
             console.log(error);
         }
@@ -97,11 +97,11 @@ export class SearchController extends Controller{
      *       200:
      *         description: Successfully returns a json containing 100 shuffled search results.
      */
-    shuffled(req, res) {
+    async shuffled(req, res) {
         try {
             let query = this.validateInput(req, res);
             const _ = require("underscore");
-            res.json(_.shuffle(this.search(query)));
+            res.json(_.shuffle(await this.search(query)));
         } catch(error) {
             console.log(error);
         }
@@ -118,9 +118,11 @@ export class SearchController extends Controller{
         let query = req.params.query;
         if (!query) {
             res.error({"error": "Search query param missing or empty"});
-            throw new error("Missing Query param");
+            throw new Error("Missing Query param");
         }
         return query;
     }
 
 };
+
+module.exports = SearchController;

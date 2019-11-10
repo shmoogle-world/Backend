@@ -22,4 +22,4 @@ Smoogle world search routes.
 * ``/:query`` 
   * Returns a shuffled and unshuffled search query result
 
-possibly move the frontend to here.
+[Link To the Api](https://bingsearchapiv1.azurewebsites.net/docs)

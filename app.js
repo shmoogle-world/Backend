@@ -3,14 +3,16 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-const indexRouter = require("./routes/index");
+const dotenv = require('dotenv');
+dotenv.config();
+
+const indexRouter = require("./routes/indexRouter");
 const shmoogleShuffleRouter = require("./routes/shmoogleShuffle");
 const shmoogleAddUserRouter = require("./routes/addUser");
 const apiRouter = require("./routes/apiRoutes");
 const docs = require('./routes/DocsRoutes');
 
 const app = express();
-
 // 1 minute // 60 requests
 // return exception
 // upload to azure

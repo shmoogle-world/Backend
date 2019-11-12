@@ -6,6 +6,9 @@ const logger = require("morgan");
 const indexRouter = require("./routes/index");
 const shmoogleShuffleRouter = require("./routes/shmoogleShuffle");
 const shmoogleAddUserRouter = require("./routes/addUser");
+const apiRouter = require("./routes/apiRoutes");
+const docs = require('./routes/DocsRoutes');
+
 const app = express();
 
 // 1 minute // 60 requests
@@ -42,6 +45,8 @@ app.use(function(req, res, next) {
 });
 
 app.use("/", indexRouter);
+app.use('/docs/', docs);
+app.use("/api", apiRouter);
 app.use("/shmoogleShuffle", shmoogleShuffleRouter);
 app.use("/shmoogleAddUser", shmoogleAddUserRouter);
 

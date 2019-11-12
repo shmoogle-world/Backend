@@ -9,7 +9,6 @@ const axios = require("axios");
 const _ = require("underscore");
 
 const SUBSCRIPTION_KEY = process.env.APPSETTING_SUBSCRIPTION_KEY;
-// TODO - Hide key in env variable on the server
 
 if (!SUBSCRIPTION_KEY) {
   throw new Error("AZURE_SUBSCRIPTION_KEY is not set.");
@@ -53,6 +52,7 @@ async function bingSearchQuery(query, offset) {
 
     let queryResultArray = [];
     Promise.all([query1, query2]).then(responseArray => {
+      console.log(responseArray);
       let resultIndexCounter = 0;
       responseArray.forEach(element => {
         element.data.webPages.value.forEach(item => {

@@ -31,7 +31,7 @@ class SwaggerController {
                     version: '1.0.0',
                 },
             },
-            apis: ['./**/EmbeddedSearchController.js','./**/SearchController.js'],
+            apis: ['./**/CustomSearchController.js','./**/SearchController.js'],
         };
         res.json(swaggerJSDoc(options));
     }

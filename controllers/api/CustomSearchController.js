@@ -11,7 +11,7 @@ class CustomSearchController extends SearchControllerInterface {
      * @param {Response} res 
      * @swagger
      *
-     * /custom/search/{query}/:
+     * /api/custom/search/{query}/:
      *   get:
      *     description: Sends a search request.
      *     produces:
@@ -47,14 +47,14 @@ class CustomSearchController extends SearchControllerInterface {
             if(!key) throw "Key was not specified"; //Make sure key was passed.
 
             let site = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            console.log(site);
             
-            if(req.query.site) {
+            if(req.query.site && req.query.site.length > 0) {
                 site = req.query.site; //if given a site sets it to the active one to fix the query.
             }
-            
+
             const _ = require("underscore");
             let queryResponse = await this.search(query+" site:"+site); // insite specific search.
-
             res.json([
                 queryResponse,
                 _.shuffle(queryResponse),
@@ -66,30 +66,25 @@ class CustomSearchController extends SearchControllerInterface {
     }
     
 
-        /**
+    /**
      * returns an array containing both shuffled and unshuffled results
      * 
      * @param {Request} req 
      * @param {Response} res 
      * @swagger
      *
-     * /embedded/signup/:
+     * /api/custom/signup/:
      *   post:
      *     description: signs up using a token email and site
      *     produces:
      *       - application/json
      *     parameters:
-     *       - email: email
+     *       - name: email
      *         description: users email.
      *         in: query
      *         required: true
      *         type: string
-     *       - token: token
-     *         description: The private access key.
-     *         in: query
-     *         required: true
-     *         type: string
-     *       - site: site
+     *       - name: site
      *         description: Sites to search in.
      *         in: query
      *         required: true
@@ -103,17 +98,29 @@ class CustomSearchController extends SearchControllerInterface {
     async signUp(req, res) {
         //check if user already exists
         let q1 = "SELECT `id` FROM `access_token` WHERE `email` = '" + req.query.email + "'";
-        let res = await connector.query(q1);
+        let data = await connector.query(q1);
+        let token = AccessMiddleware.generateToken();
+        if(!data.length){
+            let q2 = "INSERT INTO `access_token`(`id`, `email`, `token`, `created_at`, `updated_at`) VALUES (NULL,'" + req.query.email + "','"+token+"',NULL,NULL)";
+            data = await connector.query(q2);
+            data = await connector.query(q1);
+        }
+
+        if(!data.length){
+            res.status(500).send({"error":"Internal server error, please try again later."});
+            return;
+        }
         
-        //insert if not exist
-        let q2 = "INSERT INTO `access_token`(`id`, `email`, `token`, `created_at`, `updated_at`) VALUES (NULL,'"+req.query.email+"','"+req.query.token+"',NULL,NULL)";
-        let q3 = "SELECT `id` FROM `access_token` WHERE `email` = '" + req.query.email + "'";
-        let id = AccessMiddleware.generateToken();
-        let accessToken;
 
         //pull id and update his tokenlist with new token. 
-        let q4 = "INSERT INTO `access_limitation`(`id`, `access_token_id`, `url`) VALUES ('"+id+"','"+accessToken+"','"+req.query.site+"')";
-
+        let q4 = "INSERT INTO `access_limitation`(`id`, `access_token_id`, `url`) VALUES (NULL,'" + data[0].id + "','" + req.query.site + "')";
+        data = await connector.query(q4);
+        
+        let serverIp = req.protocol + '://' + req.host;
+        res.send(
+            `<div id="shw-search"></div>
+            <script src="${serverIp}/custom/search.js?key=${token}"></script>`
+            );
     }
     
 

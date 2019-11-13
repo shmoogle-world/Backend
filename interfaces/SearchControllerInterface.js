@@ -16,7 +16,9 @@ class SearchControllerInterface extends ControllerInterface {
                 self.fetchQuery(searchQuery, 50)
             ]).then(responseArray =>
                 resolve(self.parseResult(responseArray))
-            );
+            ).catch(err => {
+                resolve({"error": err});
+            });
         });
     };
 
@@ -39,7 +41,6 @@ class SearchControllerInterface extends ControllerInterface {
                 "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY
             }
         };
-
         return axios.get(_query.url + _query.query + offset, {
             headers: _query.headers
         });
@@ -54,8 +55,8 @@ class SearchControllerInterface extends ControllerInterface {
     parseResult(responseArray) {
         let resultIndexCounter = 0;
         let resultArray = [];
-
         responseArray.forEach(element => {
+            if(!element.data.webPages) throw "No results";
             element.data.webPages.value
                 .forEach(item => {
                     item.originalResultIndex = resultIndexCounter++;

@@ -38,18 +38,15 @@ class AccessMiddleware {
      * 
      */
     static async run(req, res, next) {
-
-        // console.log(req.query.key);
         
         if(!req.query.key){ 
             res.status(400).send({"error":"Access token is missing."});
             return;
         }
         let ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-        // console.log(ip);
+
 
         let data = await AccessMiddleware.getDataByToken(req.query.key);
-        // console.log(data.length);
         if(!data.length){
             res.status(402).send({"error":"Invalid access token"});
             return;
@@ -57,13 +54,11 @@ class AccessMiddleware {
         let sites = await AccessMiddleware.getSiteByID(data[0].id);
 
         let clientIP = false;
-        let index = 0;
-        // console.log(sites)
         for(let site of sites) {
             if(site.url == ip){
                 clientIP = true;
+                break;
             }
-            index++;
         }
 
         if(!clientIP) {

@@ -1,6 +1,8 @@
 const SearchControllerInterface = require('../../interfaces/SearchControllerInterface');
+const AccessMiddleware = require('../../middleware/AccessMiddleware');
+const connector = new (require('../../interfaces/SqlConnector'));
 
-class EmbeddedSearchController extends SearchControllerInterface {
+class CustomSearchController extends SearchControllerInterface {
     
     /**
      * returns an array containing both shuffled and unshuffled results
@@ -9,7 +11,7 @@ class EmbeddedSearchController extends SearchControllerInterface {
      * @param {Response} res 
      * @swagger
      *
-     * /embedded/search/{query}/:
+     * /custom/search/{query}/:
      *   get:
      *     description: Sends a search request.
      *     produces:
@@ -46,7 +48,7 @@ class EmbeddedSearchController extends SearchControllerInterface {
 
             let site = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
             
-            if(req.query.site){
+            if(req.query.site) {
                 site = req.query.site; //if given a site sets it to the active one to fix the query.
             }
             
@@ -71,26 +73,26 @@ class EmbeddedSearchController extends SearchControllerInterface {
      * @param {Response} res 
      * @swagger
      *
-     * /embedded/search/{query}/:
-     *   get:
-     *     description: Sends a search request.
+     * /embedded/signup/:
+     *   post:
+     *     description: signs up using a token email and site
      *     produces:
      *       - application/json
      *     parameters:
-     *       - name: query
-     *         description: The search query.
-     *         in: path
+     *       - email: email
+     *         description: users email.
+     *         in: query
      *         required: true
      *         type: string
-     *       - name: key
-     *         description: The access key.
-     *         in: path
+     *       - token: token
+     *         description: The private access key.
+     *         in: query
      *         required: true
      *         type: string
-     *       - name: site
+     *       - site: site
      *         description: Sites to search in.
      *         in: query
-     *         required: false
+     *         required: true
      *         type: string
      *     tags:
      *         - site search
@@ -99,6 +101,19 @@ class EmbeddedSearchController extends SearchControllerInterface {
      *         description: Successfully returns a json cotaining site specific results
      */
     async signUp(req, res) {
+        //check if user already exists
+        let q1 = "SELECT `id` FROM `access_token` WHERE `email` = '" + req.query.email + "'";
+        let res = await connector.query(q1);
+        
+        //insert if not exist
+        let q2 = "INSERT INTO `access_token`(`id`, `email`, `token`, `created_at`, `updated_at`) VALUES (NULL,'"+req.query.email+"','"+req.query.token+"',NULL,NULL)";
+        let q3 = "SELECT `id` FROM `access_token` WHERE `email` = '" + req.query.email + "'";
+        let id = AccessMiddleware.generateToken();
+        let accessToken;
+
+        //pull id and update his tokenlist with new token. 
+        let q4 = "INSERT INTO `access_limitation`(`id`, `access_token_id`, `url`) VALUES ('"+id+"','"+accessToken+"','"+req.query.site+"')";
+
     }
     
 
@@ -120,4 +135,4 @@ class EmbeddedSearchController extends SearchControllerInterface {
 
 };
 
-module.exports = EmbeddedSearchController;
+module.exports = CustomSearchController;

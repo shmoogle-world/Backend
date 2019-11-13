@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const SearchController = new (require('../controllers/api/SearchController'));
-const EmbeddedSearchController = new (require('../controllers/api/EmbeddedSearchController'));
+const CustomSearchController = new (require('../controllers/api/CustomSearchController'));
 
 const AccessMiddleware = require('../middleware/AccessMiddleware');
 
-router.get("/embedded/search/:query", AccessMiddleware.run, (req, res) => {
-    EmbeddedSearchController.index(req, res);
+router.get("/custom/search/:query", AccessMiddleware.run, (req, res) => {
+    CustomSearchController.index(req, res);
 });
 
 

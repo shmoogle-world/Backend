@@ -18,7 +18,7 @@ class AccessMiddleware {
     static async getDataByToken(token) {
         let query = "SELECT * FROM `access_token` WHERE `token` = '" + token + "'";
         let res = await connector.query(query);
-        console.log("token return: ", res);
+        // console.log("token return: ", res);
         return res;
     }; 
 
@@ -29,7 +29,7 @@ class AccessMiddleware {
     static async getSiteByID(id) {
         let query = "SELECT * FROM `access_limitation` WHERE `access_token_id` = '"+id+"'";
         let res = await connector.query(query);
-        console.log("token id: ", res);
+        // console.log("token id: ", res);
         return res;
     };   
 
@@ -39,7 +39,7 @@ class AccessMiddleware {
      */
     static async run(req, res, next) {
 
-        console.log(req.query.key);
+        // console.log(req.query.key);
         
         if(!req.query.key){ 
             res.status(400).send({"error":"Access token is missing."});
@@ -49,17 +49,17 @@ class AccessMiddleware {
         // console.log(ip);
 
         let data = await AccessMiddleware.getDataByToken(req.query.key);
-        console.log(data.length);
+        // console.log(data.length);
         if(!data.length){
             res.status(402).send({"error":"Invalid access token"});
             return;
         }
-        let sites = await AccessMiddleware.getSiteByID(data.id);
+        let sites = await AccessMiddleware.getSiteByID(data[0].id);
 
         let clientIP = false;
         let index = 0;
-
-        for(let site in sites){
+        // console.log(sites)
+        for(let site of sites) {
             if(site.url == ip){
                 clientIP = true;
             }

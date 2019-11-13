@@ -7,8 +7,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const indexRouter = require("./routes/indexRouter");
-const shmoogleShuffleRouter = require("./routes/shmoogleShuffle");
-const shmoogleAddUserRouter = require("./routes/addUser");
 const apiRouter = require("./routes/apiRoutes");
 const docs = require('./routes/DocsRoutes');
 
@@ -49,8 +47,6 @@ app.use(function(req, res, next) {
 app.use("/", indexRouter);
 app.use('/docs/', docs);
 app.use("/api", apiRouter);
-app.use("/shmoogleShuffle", shmoogleShuffleRouter);
-app.use("/shmoogleAddUser", shmoogleAddUserRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

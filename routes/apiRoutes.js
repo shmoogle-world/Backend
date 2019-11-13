@@ -3,6 +3,13 @@ const router = express.Router();
 const SearchController = new (require('../controllers/api/SearchController'));
 const EmbeddedSearchController = new (require('../controllers/api/EmbeddedSearchController'));
 
+const AccessMiddleware = require('../middleware/AccessMiddleware');
+
+router.get("/embedded/search/:query", AccessMiddleware.run, (req, res) => {
+    EmbeddedSearchController.index(req, res);
+});
+
+
 /**
  * Shmoogle Images routes
  */
@@ -11,7 +18,7 @@ const EmbeddedSearchController = new (require('../controllers/api/EmbeddedSearch
 /**
  * Shmoogle Search routes
  */
-router.get("/search/:query/unshuffled", (req, res) => {
+router.get("/search/:query/unshuffled",(req, res) => {
     SearchController.unshuffled(req, res);
 });
 router.get("/search/:query/shuffled", (req, res) => {
@@ -40,10 +47,5 @@ function siteSearch(req, res, next) {
     // Check if a site param is present parse if needed,
     // else get the sites that the access key is affiliated with and send them with req. 
 }
-
-
-router.get("/embedded/search/:query/", (req, res) => {
-    EmbeddedSearchController.index(req, res);
-});
 
 module.exports = router;

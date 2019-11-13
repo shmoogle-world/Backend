@@ -39,15 +39,25 @@ class EmbeddedSearchController extends SearchControllerInterface {
     async index(req, res) {
         try {
             let query = this.validateInput(req, res);
-            let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+            let key = req.params.key;
+
+            if(!key) throw "Key was not specified"; //Make sure key was passed.
+
+            let site = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
             
-            if(req.params.site)
+            if(req.params.site){
+                site = req.params.site; //if given a site sets it to the active one to fix the query.
+            }
+
             const _ = require("underscore");
-            let queryResponse = await this.search(query); // "site:"
+            let queryResponse = await this.search(query+" site:"+site); // insite specific search.
+
             res.json([
                 queryResponse,
                 _.shuffle(queryResponse),
             ]);
+
         } catch(error) {
             console.log(error);
         }

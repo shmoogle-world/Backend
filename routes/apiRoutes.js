@@ -25,12 +25,7 @@ router.get("/search/:query", (req, res) => {
 /**
  * Shmoogle Embedded search
  */
-// router.post("/embedded/", (req, res) => {
-//     SearchController.unshuffled(req, res); // RECIEVE THE DATA FROM THEM TO ADD TO SQL
-// });
-// router.get("/embedded/search/:query/", (req, res) => {
-//     SearchController.shuffled(req, res);
-// });
+
 function accessMiddlware(req, res, next) {
 
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;

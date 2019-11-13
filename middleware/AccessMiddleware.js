@@ -1,4 +1,5 @@
 const connector = new (require('../interfaces/SqlConnector.js'));
+const uuidv4 = require('uuid/v4');
 
 class AccessMiddleware {
 
@@ -7,7 +8,7 @@ class AccessMiddleware {
       */
 
     static generateToken(){
-        //Good way to generate tokens.
+        return uuidv4(); //generates base on random (uuidv4 read more about it in : https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_1_(date-time_and_MAC_address) )
     }
 
     /**

@@ -6,8 +6,8 @@ router.get('/', function(req, res, next) {
     res.render('index', { title: 'Express' });
 });
 
-router.get('/assets/embedded.js', function(req, res) {
-    let accessKey = req.param.key;
+router.get('/custom/search.js', function(req, res) {
+    let accessKey = req.query.key;
 
     var fs = require('fs');
     var path = require('path');

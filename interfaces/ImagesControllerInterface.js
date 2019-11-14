@@ -1,7 +1,7 @@
 const ControllerInterface = require('./ControllerInterface');
 const axios = require("axios");
 
-class SearchControllerInterface extends ControllerInterface {
+class ImagesControllerInterface extends ControllerInterface{
 
     /**
      * Fetches 100 search results from the bing api.
@@ -35,7 +35,7 @@ class SearchControllerInterface extends ControllerInterface {
         }
 
         var _query = {
-            url: "https://api.cognitive.microsoft.com/bing/v7.0/search?q=",
+            url: "https://api.cognitive.microsoft.com/bing/v7.0/images/search?q=",
             query: encodeURIComponent(query) + "&count=50&offset=",
             headers: {
                 "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY
@@ -57,8 +57,8 @@ class SearchControllerInterface extends ControllerInterface {
         let resultArray = [];
 
         responseArray.forEach(element => {
-            if(!element.data.webPages) throw "No results";
-            element.data.webPages.value
+            if(!element.data) throw "No results";
+            element.data.value
                 .forEach(item => {
                     item.originalResultIndex = resultIndexCounter++;
                     resultArray.push(item);
@@ -69,4 +69,4 @@ class SearchControllerInterface extends ControllerInterface {
     };
 }
 
-module.exports = SearchControllerInterface;
+module.exports = ImagesControllerInterface;

@@ -29,9 +29,9 @@ class SwaggerController {
                 info: {
                     title: 'Shmoogle world api',
                     version: '1.0.0',
-                },
+                },  
             },
-            apis: ['./**/CustomSearchController.js','./**/SearchController.js'],
+            apis: ['./**/CustomSearchController.js','./**/SearchController.js','./**/ImagesController.js'],
         };
         res.json(swaggerJSDoc(options));
     }

@@ -3,6 +3,11 @@ const axios = require("axios");
 
 class SearchControllerInterface extends ControllerInterface {
 
+    constructor() {
+        super();
+        this.endpoint = "https://api.cognitive.microsoft.com/bing/v7.0/search?q=";
+    }
+
     /**
      * Fetches 100 search results from the bing api.
      * 
@@ -35,7 +40,7 @@ class SearchControllerInterface extends ControllerInterface {
         }
 
         var _query = {
-            url: "https://api.cognitive.microsoft.com/bing/v7.0/search?q=",
+            url: this.endpoint,
             query: encodeURIComponent(query) + "&count=50&offset=",
             headers: {
                 "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY

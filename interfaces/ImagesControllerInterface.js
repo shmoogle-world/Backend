@@ -1,51 +1,12 @@
-const ControllerInterface = require('./ControllerInterface');
+const SearchControllerInterface = require('./SearchControllerInterface');
 const axios = require("axios");
 
-class ImagesControllerInterface extends ControllerInterface{
+class ImagesControllerInterface extends SearchControllerInterface {
 
-    /**
-     * Fetches 100 search results from the bing api.
-     * 
-     * @param {string} searchQuery
-     */
-    search(searchQuery) {
-        let self = this;
-        return new Promise(function (resolve, reject) {
-            Promise.all([
-                self.fetchQuery(searchQuery),
-                self.fetchQuery(searchQuery, 50)
-            ]).then(responseArray =>
-                resolve(self.parseResult(responseArray))
-            ).catch(err => {
-                resolve({"error": err});
-            });
-        });
-    };
-
-    /**
-     * Fetches a search query from the bing api.
-     * 
-     * @param {string} queryArray Search query to lookup
-     */
-    fetchQuery(query, offset = 0) {
-        const SUBSCRIPTION_KEY = process.env.APPSETTING_SUBSCRIPTION_KEY;
-
-        if (!SUBSCRIPTION_KEY) {
-            throw new Error("AZURE_SUBSCRIPTION_KEY is not set.");
-        }
-
-        var _query = {
-            url: "https://api.cognitive.microsoft.com/bing/v7.0/images/search?q=",
-            query: encodeURIComponent(query) + "&count=50&offset=",
-            headers: {
-                "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY
-            }
-        };
-        return axios.get(_query.url + _query.query + offset, {
-            headers: _query.headers
-        });
-    };
-
+    constructor() {
+        super();
+        this.endpoint = "https://api.cognitive.microsoft.com/bing/v7.0/images/search?q=";
+    }
 
     /**
      * Parses the bing response to be more useful.

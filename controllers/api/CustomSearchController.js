@@ -101,10 +101,11 @@ class CustomSearchController extends SearchControllerInterface {
      */
     async signUp(req, res) {
         //check if user already exists
-        let q1 = "SELECT `id` FROM `access_token` WHERE `email` = '" + req.query.email + "'";
+        let q1 = "SELECT `id`,`token` FROM `access_token` WHERE `email` = '" + req.query.email + "'";
+        let token;
         let data = await connector.query(q1);
-        let token = AccessMiddleware.generateToken();
         if(!data.length){
+            token = AccessMiddleware.generateToken();
             let q2 = "INSERT INTO `access_token`(`id`, `email`, `token`, `created_at`, `updated_at`) VALUES (NULL,'" + req.query.email + "','"+token+"',NULL,NULL)";
             data = await connector.query(q2);
             data = await connector.query(q1);
@@ -115,16 +116,22 @@ class CustomSearchController extends SearchControllerInterface {
             return;
         }
         
+        //if he already signed up with this url.
+        q1 = "SELECT * FROM `access_limitation` WHERE `access_token_id` = '"+data[0].id+"' AND `url` = '"+req.query.site +"'";
+        let id = data[0].id;
+        token = data[0].token;
+        data = await connector.query(q1);
 
-        //pull id and update his tokenlist with new token. 
-        let q4 = "INSERT INTO `access_limitation`(`id`, `access_token_id`, `url`) VALUES (NULL,'" + data[0].id + "','" + req.query.site + "')";
-        data = await connector.query(q4);
-        
+        if(!data.length){
+            // pull id and update his tokenlist with new token. 
+            q1 = "INSERT INTO `access_limitation`(`id`, `access_token_id`, `url`) VALUES (NULL,'" + id + "','" + req.query.site + "')";
+            data = await connector.query(q1);
+        }
         let serverIp = req.protocol + '://' + req.host;
-        res.send(
-            `<div id="shw-search"></div>
-            <script src="${serverIp}/custom/search.js?key=${token}"></script>`
-            );
+        res.send(`Your Token is : ${token}
+        Please use the following code in your site:
+            <div id="shw-search"></div>
+            <script src="${serverIp}/custom/search.js?key=${token}"></script>`);
     }
     
 

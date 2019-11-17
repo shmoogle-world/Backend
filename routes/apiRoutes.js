@@ -19,13 +19,13 @@ router.post("/custom/signup/", (req, res) => {
 /**
  * Shmoogle Images routes
  */
-router.get("/search/images/:query/unshuffled", (req, res) => {
+router.get("/search/images/:query/unshuffled", AccessMiddleware.run, (req, res) => {
     ImagesController.unshuffled(req, res);
 });
-router.get("/search/images/:query/shuffled", (req, res) => {
+router.get("/search/images/:query/shuffled", AccessMiddleware.run, (req, res) => {
     ImagesController.shuffled(req, res);
 });
-router.get("/search/images/:query", (req, res) => {
+router.get("/search/images/:query", AccessMiddleware.run, (req, res) => {
     ImagesController.index(req, res);
 });
 
@@ -33,13 +33,13 @@ router.get("/search/images/:query", (req, res) => {
 /**
  * Shmoogle Search routes
  */
-router.get("/search/:query/unshuffled", (req, res) => {
+router.get("/search/:query/unshuffled", AccessMiddleware.run, (req, res) => {
     SearchController.unshuffled(req, res);
 });
-router.get("/search/:query/shuffled", (req, res) => {
+router.get("/search/:query/shuffled", AccessMiddleware.run, (req, res) => {
     SearchController.shuffled(req, res);
 });
-router.get("/search/:query", (req, res) => {
+router.get("/search/:query", AccessMiddleware.run, (req, res) => {
     SearchController.index(req, res);
 });
 

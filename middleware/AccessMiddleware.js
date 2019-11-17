@@ -18,7 +18,6 @@ class AccessMiddleware {
     static async getDataByToken(token) {
         let query = "SELECT * FROM `access_token` WHERE `token` = '" + token + "'";
         let res = await connector.query(query);
-        // console.log("token return: ", res);
         return res;
     }; 
 
@@ -29,7 +28,6 @@ class AccessMiddleware {
     static async getSiteByID(id) {
         let query = "SELECT * FROM `access_limitation` WHERE `access_token_id` = '"+id+"'";
         let res = await connector.query(query);
-        // console.log("token id: ", res);
         return res;
     };   
 
@@ -39,16 +37,20 @@ class AccessMiddleware {
      */
     static async run(req, res, next) {
         
+        let ip = req.hostname;
+        if(ip == process.env.HOST) {
+            next();
+            return;
+        }
+
         if(!req.query.key){ 
             res.status(400).send({"error":"Access token is missing."});
             return;
         }
-        let ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-
-
+        
         let data = await AccessMiddleware.getDataByToken(req.query.key);
         if(!data.length){
-            res.status(402).send({"error":"Invalid access token"});
+            res.status(401).send({"error":"Invalid access token"});
             return;
         }
         let sites = await AccessMiddleware.getSiteByID(data[0].id);

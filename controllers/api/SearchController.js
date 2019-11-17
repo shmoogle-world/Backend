@@ -20,6 +20,11 @@ class SearchController extends SearchControllerInterface {
      *         in: path
      *         required: true
      *         type: string
+     *       - name: key
+     *         description: The access key.
+     *         in: query
+     *         required: true
+     *         type: string
      *     tags:
      *         - search
      *     responses:
@@ -58,6 +63,11 @@ class SearchController extends SearchControllerInterface {
      *         in: path
      *         required: true
      *         type: string
+     *       - name: key
+     *         description: The access key.
+     *         in: query
+     *         required: true
+     *         type: string
      *     tags:
      *         - search
      *     responses:
@@ -89,6 +99,11 @@ class SearchController extends SearchControllerInterface {
      *       - name: query
      *         description: The search query.
      *         in: path
+     *         required: true
+     *         type: string
+     *       - name: key
+     *         description: The access key.
+     *         in: query
      *         required: true
      *         type: string
      *     tags:

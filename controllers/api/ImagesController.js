@@ -19,6 +19,11 @@ class ImagesController extends ImagesControllerInterface{
      *         in: path
      *         required: true
      *         type: string
+     *       - name: key
+     *         description: The access key.
+     *         in: query
+     *         required: true
+     *         type: string
      *     tags:
      *         - images
      *     responses:
@@ -57,6 +62,11 @@ class ImagesController extends ImagesControllerInterface{
      *         in: path
      *         required: true
      *         type: string
+     *       - name: key
+     *         description: The access key.
+     *         in: query
+     *         required: true
+     *         type: string
      *     tags:
      *         - images
      *     responses:
@@ -88,6 +98,11 @@ class ImagesController extends ImagesControllerInterface{
      *       - name: query
      *         description: The search query.
      *         in: path
+     *         required: true
+     *         type: string
+     *       - name: key
+     *         description: The access key.
+     *         in: query
      *         required: true
      *         type: string
      *     tags:

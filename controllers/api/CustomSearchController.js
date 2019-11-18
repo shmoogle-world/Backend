@@ -97,7 +97,7 @@ class CustomSearchController extends SearchControllerInterface {
      *         - site search
      *     responses:
      *       200:
-     *         description: Successfully returns a json cotaining site specific results
+     *         description: Successfully returns a token with html code to be implemented into site and use the prebuilt in site search module
      */
     async signUp(req, res) {
         //check if user already exists

@@ -71,7 +71,7 @@ class ImagesController extends ImagesControllerInterface{
      *         - images
      *     responses:
      *       200:
-     *         description: Successfully returns a json containing 100 search results.
+     *         description: Successfully returns a json containing 100 images search results.
      */
     async unshuffled(req, res) {
         try {
@@ -109,7 +109,7 @@ class ImagesController extends ImagesControllerInterface{
      *         - images
      *     responses:
      *       200:
-     *         description: Successfully returns a json containing 100 shuffled search results.
+     *         description: Successfully returns a json containing 100 shuffled images search results.
      */
     async shuffled(req, res) {
         try {

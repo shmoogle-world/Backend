@@ -3,6 +3,11 @@ const axios = require("axios");
 
 class SearchControllerInterface extends ControllerInterface {
 
+    constructor() {
+        super();
+        this.endpoint = "https://api.cognitive.microsoft.com/bing/v7.0/search?q=";
+    }
+
     /**
      * Fetches 100 search results from the bing api.
      * 
@@ -16,7 +21,9 @@ class SearchControllerInterface extends ControllerInterface {
                 self.fetchQuery(searchQuery, 50)
             ]).then(responseArray =>
                 resolve(self.parseResult(responseArray))
-            );
+            ).catch(err => {
+                resolve({"error": err});
+            });
         });
     };
 
@@ -33,13 +40,12 @@ class SearchControllerInterface extends ControllerInterface {
         }
 
         var _query = {
-            url: "https://api.cognitive.microsoft.com/bing/v7.0/search?q=",
+            url: this.endpoint,
             query: encodeURIComponent(query) + "&count=50&offset=",
             headers: {
                 "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY
             }
         };
-
         return axios.get(_query.url + _query.query + offset, {
             headers: _query.headers
         });
@@ -56,6 +62,7 @@ class SearchControllerInterface extends ControllerInterface {
         let resultArray = [];
 
         responseArray.forEach(element => {
+            if(!element.data.webPages) throw "No results";
             element.data.webPages.value
                 .forEach(item => {
                     item.originalResultIndex = resultIndexCounter++;

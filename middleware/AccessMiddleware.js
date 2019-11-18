@@ -37,19 +37,22 @@ class AccessMiddleware {
      */
     static async run(req, res, next) {
         
-        let ip = req.hostname;
-        if(ip == process.env.HOST) {
+        let ip = req.headers.origin;
+
+        if(ip) {
+            ip = ip.split("//")[1].split(":")[0];     
+        }else {
             next();
             return;
-        }
+        }         
 
-        if(!req.query.key){ 
+        if(!req.query.key) { 
             res.status(400).send({"error":"Access token is missing."});
             return;
         }
         
         let data = await AccessMiddleware.getDataByToken(req.query.key);
-        if(!data.length){
+        if(!data.length) {
             res.status(401).send({"error":"Invalid access token"});
             return;
         }

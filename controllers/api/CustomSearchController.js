@@ -41,14 +41,11 @@ class CustomSearchController extends SearchControllerInterface {
     async index(req, res) {
         try {
             let query = this.validateInput(req, res);
-            console.log(query);
             let key = req.query.key;
+            let site = "";
 
             if(!key) throw "Key was not specified"; //Make sure key was passed.
 
-            let site = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-            console.log(site);
-            
             if(req.query.site && req.query.site.length > 0) {
                 site = req.query.site; //if given a site sets it to the active one to fix the query.
             }

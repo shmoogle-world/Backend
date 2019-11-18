@@ -14,8 +14,6 @@ router.get("/custom/search/:query", AccessMiddleware.run, (req, res) => {
 router.post("/custom/signup/", (req, res) => {
     CustomSearchController.signUp(req, res);
 });
-
-
 /**
  * Shmoogle Images routes
  */

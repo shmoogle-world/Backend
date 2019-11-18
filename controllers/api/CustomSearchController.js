@@ -127,7 +127,7 @@ class CustomSearchController extends SearchControllerInterface {
             q1 = "INSERT INTO `access_limitation`(`id`, `access_token_id`, `url`) VALUES (NULL,'" + id + "','" + req.query.site + "')";
             data = await connector.query(q1);
         }
-        let serverIp = req.protocol + '://' + req.host;
+        let serverIp = req.protocol + '://' + req.hostname;
         res.send(`Your Token is : ${token}
         Please use the following code in your site:
             <div id="shw-search"></div>

@@ -33,7 +33,7 @@ class AccessMiddleware {
 
 
     /**
-     * 
+     * Verifies the access to the database 
      */
     static async run(req, res, next) {
         
@@ -71,6 +71,17 @@ class AccessMiddleware {
             return;
         };
 
+        next();
+    }
+
+    /**
+     * recods the query requested for analytics purposes.
+     */
+    static async analytics(req, res, next){
+        console.log(req.headers.origin);
+        if(!req.headers.param) {next(); return;};
+        let query = "INSERT INTO `analytics`(`id`, `query`, `origin`, `timestamp`) VALUES (NULL,"+req.params.query+","+req.headers.originip.split("//")[1].split(":")[0]+",NULL)";
+        connector.query(query);
         next();
     }
 

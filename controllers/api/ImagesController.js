@@ -1,7 +1,6 @@
-const SearchControllerInterface = require('../../interfaces/SearchControllerInterface');
+const ImagesControllerInterface = require('../../interfaces/ImagesControllerInterface');
 
-class SearchController extends SearchControllerInterface {
-    
+class ImagesController extends ImagesControllerInterface{
     /**
      * returns an array containing both shuffled and unshuffled results
      * 
@@ -9,7 +8,7 @@ class SearchController extends SearchControllerInterface {
      * @param {Response} res 
      * @swagger
      *
-     * /api/search/{query}:
+     * /api/search/images/{query}:
      *   get:
      *     description: Sends a search request.
      *     produces:
@@ -26,10 +25,10 @@ class SearchController extends SearchControllerInterface {
      *         required: true
      *         type: string
      *     tags:
-     *         - search
+     *         - images
      *     responses:
      *       200:
-     *         description: Successfully returns a json containing 100 search results both shuffled and unshuffled.
+     *         description: Successfully returns a json containing 100 images results both shuffled and unshuffled.
      */
     async index(req, res) {
         try {
@@ -52,7 +51,7 @@ class SearchController extends SearchControllerInterface {
      * @param {Response} res
      * @swagger
      *
-     * /api/search/{query}/unshuffled:
+     * /api/search/images/{query}/unshuffled:
      *   get:
      *     description: Sends a search request to get 100 unshuffled search results.
      *     produces:
@@ -69,10 +68,10 @@ class SearchController extends SearchControllerInterface {
      *         required: true
      *         type: string
      *     tags:
-     *         - search
+     *         - images
      *     responses:
      *       200:
-     *         description: Successfully returns a json containing 100 search results.
+     *         description: Successfully returns a json containing 100 images search results.
      */
     async unshuffled(req, res) {
         try {
@@ -90,7 +89,7 @@ class SearchController extends SearchControllerInterface {
      * @param {Response} res 
      * @swagger
      *
-     * /api/search/{query}/shuffled:
+     * /api/search/images/{query}/shuffled:
      *   get:
      *     description: Sends a search request to get 100 shuffled search results.
      *     produces:
@@ -107,10 +106,10 @@ class SearchController extends SearchControllerInterface {
      *         required: true
      *         type: string
      *     tags:
-     *         - search
+     *         - images
      *     responses:
      *       200:
-     *         description: Successfully returns a json containing 100 shuffled search results.
+     *         description: Successfully returns a json containing 100 shuffled images search results.
      */
     async shuffled(req, res) {
         try {
@@ -138,6 +137,6 @@ class SearchController extends SearchControllerInterface {
         return query;
     }
 
-};
+}
 
-module.exports = SearchController;
+module.exports = ImagesController;

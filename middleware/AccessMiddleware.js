@@ -1,4 +1,4 @@
-const connector = new (require('../interfaces/SqlConnector.js'))();
+const connector = require('../interfaces/SqlConnector.js');
 const uuidv4 = require('uuid/v4');
 
 class AccessMiddleware {

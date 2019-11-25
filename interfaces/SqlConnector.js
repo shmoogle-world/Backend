@@ -2,10 +2,6 @@ const mysql = require('mysql');
 
 class Connector {
 
-    constructor() {
-        this.connector = Connector._connect();
-    }
-
     static _connect() {
         return mysql.createConnection({
             host: process.env.APPSETTING_MYSQL_HOST,
@@ -15,7 +11,7 @@ class Connector {
         });
     };
 
-    async query(sql, args) {
+    static async query(sql, args) {
         let con = Connector._connect();
 
         return new Promise((resolve, reject) => {

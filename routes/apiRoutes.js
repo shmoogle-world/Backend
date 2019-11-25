@@ -43,10 +43,12 @@ router.get("/search/:query", AccessMiddleware.run, AccessMiddleware.analytics, (
 
 
 router.get("/maillist/:email", AccessMiddleware.run, (req, res) => {
-    let query = "INSERT INTO `news_letter`(`id`, `email`) VALUES (NULL, '"+req.params.email+"',NULL)";
-    const connector = new (require('../../interfaces/SqlConnector'));
+    let query = "INSERT INTO `news_letter`(`id`, `email`, `created_at`) VALUES (NULL, '"+req.params.email+"',CURRENT_TIMESTAMP)";
+    const connector = require('../interfaces/SqlConnector');
 
     connector.query(query);
+
+    res.status(200).send({data:"Inserted Successfully"});
 });
 
 module.exports = router;

@@ -8,10 +8,10 @@ class Connector {
 
     static _connect() {
         return mysql.createConnection({
-            host: process.env.MYSQL_HOST,
-            user: process.env.MYSQL_USER,
-            password: process.env.MYSQL_PASSWORD,
-            database: process.env.MYSQL_DB
+            host: process.env.APPSETTING_MYSQL_HOST,
+            user: process.env.APPSETTING_MYSQL_USER,
+            password: process.env.APPSETTING_MYSQL_PASSWORD,
+            database: process.env.APPSETTING_MYSQL_DB
         });
     };
 

@@ -1,4 +1,4 @@
-const connector = new (require('../interfaces/SqlConnector.js'))();
+const Connector = require('../interfaces/SqlConnector.js');
 const uuidv4 = require('uuid/v4');
 
 class AccessMiddleware {
@@ -17,7 +17,7 @@ class AccessMiddleware {
 
     static async getDataByToken(token) {
         let query = "SELECT * FROM `access_token` WHERE `token` = '" + token + "'";
-        let res = await connector.query(query);
+        let res = await Connector.query(query);
         return res;
     }; 
 
@@ -27,17 +27,19 @@ class AccessMiddleware {
 
     static async getSiteByID(id) {
         let query = "SELECT * FROM `access_limitation` WHERE `access_token_id` = '"+id+"'";
-        let res = await connector.query(query);
+        let res = await Connector.query(query);
         return res;
     };   
 
 
     /**
-     * 
+     * Verifies the access to the database 
      */
     static async run(req, res, next) {
         
         let ip = req.headers.origin;
+
+        console.log(ip);
 
         if(ip) {
             ip = ip.split("//")[1].split(":")[0];     
@@ -71,6 +73,21 @@ class AccessMiddleware {
             return;
         };
 
+        next();
+    }
+
+    /**
+     * recods the query requested for analytics purposes.
+     */
+    static async analytics(req, res, next){
+        if(!req.headers.origin) {next(); return;};
+        
+        console.log(req.params.query);
+        console.log(req.headers.origin);
+        let ip = req.headers.origin;
+        ip = ip.split("//")[1].split(":")[0];
+        let query = "INSERT INTO `analytics` (`id`, `query`, `origin`, `timestamp`) VALUES (NULL, '"+req.params.query+"', '"+ip+"', CURRENT_TIMESTAMP);";
+        Connector.query(query);
         next();
     }
 

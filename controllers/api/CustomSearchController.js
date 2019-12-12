@@ -51,7 +51,8 @@ class CustomSearchController extends SearchControllerInterface {
             }
 
             const _ = require("underscore");
-            let queryResponse = await this.search(query+" site:"+site); // insite specific search.
+            let queryResponse = await this.search(query+ (site !== "" ? " site:"+site : ''));// insite specific search.
+            
             if(queryResponse.error) {
                 res.status(404).send({"error":"No Results"});
                 return;

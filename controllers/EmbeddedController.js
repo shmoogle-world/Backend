@@ -29,15 +29,6 @@ class EmbeddedController {
         let serverIp = "https" + '://' + req.hostname;
         return file.replace("UNIQUE_URL_ENDPOINT", serverIp);
     }
-
-    /**
-     * write a function to find and replace if + is in the url query for site. and then find and replace UNIQUE_URL_ENDPOINT and the site
-     */
-    
-    static _replaceNOSITESPECIFIC(file, req) {
-        return file.replace("&site=UNIQUE_URL_ENDPOINT", "");
-    }
-
 }
 
 module.exports = EmbeddedController;

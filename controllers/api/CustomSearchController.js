@@ -3,7 +3,7 @@ const AccessMiddleware = require('../../middleware/AccessMiddleware');
 const Connector = require('../../interfaces/SqlConnector');
 
 class CustomSearchController extends SearchControllerInterface {
-    
+
     /**
      * returns an array containing both shuffled and unshuffled results
      * 
@@ -44,16 +44,19 @@ class CustomSearchController extends SearchControllerInterface {
             let key = req.query.key;
             let site = "";
 
-            if(!key) throw "Key was not specified"; //Make sure key was passed.
+            if (!key) throw "Key was not specified"; //Make sure key was passed.
 
-            if(req.query.site && req.query.site.length > 0) {
+            if (req.query.site && req.query.site.length > 0) {
                 site = req.query.site; //if given a site sets it to the active one to fix the query.
             }
 
             const _ = require("underscore");
-            let queryResponse = await this.search(query+" site:"+site); // insite specific search.
-            if(queryResponse.error) {
-                res.status(404).send({"error":"No Results"});
+            let queryResponse = await this.search(query + (site.length > 0 ? " site:" + site : '')); // insite specific search.
+
+            if (queryResponse.error) {
+                res.status(404).send({
+                    "error": "No Results"
+                });
                 return;
             }
             res.json([
@@ -61,11 +64,11 @@ class CustomSearchController extends SearchControllerInterface {
                 _.shuffle(queryResponse),
             ]);
 
-        } catch(error) {
+        } catch (error) {
             console.log(error);
         }
     }
-    
+
 
     /**
      * returns an array containing both shuffled and unshuffled results
@@ -76,7 +79,7 @@ class CustomSearchController extends SearchControllerInterface {
      *
      * /api/custom/signup/:
      *   post:
-     *     description: signs up using a token email and site
+     *     description: signs up using a token email and site <br> in order to specify a new site search, update the query parameter site to equal the new site or remove it to allow all sites
      *     produces:
      *       - application/json
      *     parameters:
@@ -85,11 +88,16 @@ class CustomSearchController extends SearchControllerInterface {
      *         in: query
      *         required: true
      *         type: string
-     *       - name: site
-     *         description: Sites to search in.
+     *       - name: host
+     *         description: The site url that will be sending the request, in other words your site.
      *         in: query
      *         required: true
-     *         type: string
+     *         type: uri
+     *       - name: site
+     *         description: Specifing a site here will filter all responses to only show results for this site.
+     *         in: query
+     *         required: false
+     *         type: uri
      *     tags:
      *         - site search
      *     responses:
@@ -101,36 +109,40 @@ class CustomSearchController extends SearchControllerInterface {
         let q1 = "SELECT `id`,`token` FROM `access_token` WHERE `email` = '" + req.query.email + "'";
         let token;
         let data = await Connector.query(q1);
-        if(!data.length){
+        if (!data.length) {
             token = AccessMiddleware.generateToken();
-            let q2 = "INSERT INTO `access_token`(`id`, `email`, `token`, `created_at`, `updated_at`) VALUES (NULL,'" + req.query.email + "','"+token+"',NULL,NULL)";
+            let q2 = "INSERT INTO `access_token`(`id`, `email`, `token`, `created_at`, `updated_at`) VALUES (NULL,'" + req.query.email + "','" + token + "',NULL,NULL)";
             data = await Connector.query(q2);
             data = await Connector.query(q1);
         }
 
-        if(!data.length){
-            res.status(500).send({"error":"Internal server error, please try again later."});
+        if (!data.length) {
+            res.status(500).send({
+                "error": "Internal server error, please try again later."
+            });
             return;
         }
-        
+
         //if he already signed up with this url.
-        q1 = "SELECT * FROM `access_limitation` WHERE `access_token_id` = '"+data[0].id+"' AND `url` = '"+req.query.site +"'";
+        q1 = "SELECT * FROM `access_limitation` WHERE `access_token_id` = '" + data[0].id + "' AND `url` = '" + req.query.host + "'";
         let id = data[0].id;
         token = data[0].token;
         data = await Connector.query(q1);
 
-        if(!data.length){
+        if (!data.length) {
             // pull id and update his tokenlist with new token. 
-            q1 = "INSERT INTO `access_limitation`(`id`, `access_token_id`, `url`) VALUES (NULL,'" + id + "','" + req.query.site + "')";
+            q1 = "INSERT INTO `access_limitation`(`id`, `access_token_id`, `url`) VALUES (NULL,'" + id + "','" + req.query.host + "')";
             data = await Connector.query(q1);
         }
-        let serverIp = req.protocol + '://' + req.hostname;
+        //let serverIp = req.protocol + '://' + req.hostname;
+        let serverIp = 'https://' + req.hostname;
+        let siteSpecific = req.query.site ? '&site=' + req.query.site : '';
         res.send(`Your Token is : ${token}
         Please use the following code in your site:
             <div id="shw-search"></div>
-            <script src="${serverIp}/custom/search.js?key=${token}"></script>`);
+            <script src="${serverIp}/custom/search.js?key=${token}${siteSpecific}"></script>`);
     }
-    
+
 
     /**
      * CHECKS IF QUERY IS EMPTY OR NARH
@@ -142,7 +154,9 @@ class CustomSearchController extends SearchControllerInterface {
     validateInput(req, res) {
         let query = req.params.query;
         if (!query) {
-            res.error({"error": "Search query param missing or empty"});
+            res.error({
+                "error": "Search query param missing or empty"
+            });
             throw new Error("Missing Query param");
         }
         return query;

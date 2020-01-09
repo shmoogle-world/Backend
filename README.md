@@ -3,7 +3,7 @@
 This is the backend repo for the shmoogle project
 
 # Routes
-## Api
+### Api
 All routes under api will have a router group of ``/api/``.
 And all routes under api will be protected with oauth.
 ### Search routes

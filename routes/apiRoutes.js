@@ -14,6 +14,7 @@ router.get("/custom/search/:query", AccessMiddleware.run, AccessMiddleware.analy
 router.post("/custom/signup/", (req, res) => {
     CustomSearchController.signUp(req, res);
 });
+
 /**
  * Shmoogle Images routes
  */
@@ -42,13 +43,37 @@ router.get("/search/:query", AccessMiddleware.run, AccessMiddleware.analytics, (
 });
 
 
+/**
+ * Misc routers
+ */
 router.get("/maillist/:email", AccessMiddleware.run, (req, res) => {
-    let query = "INSERT INTO `news_letter`(`id`, `email`, `created_at`) VALUES (NULL, '"+req.params.email+"',CURRENT_TIMESTAMP)";
+    let query = "INSERT INTO `news_letter`(`id`, `email`, `created_at`) VALUES (NULL, '" + req.params.email + "',CURRENT_TIMESTAMP)";
     const connector = require('../interfaces/SqlConnector');
 
     connector.query(query);
 
-    res.status(200).send({data:"Inserted Successfully"});
+    res.status(200).send({
+        data: "Inserted Successfully"
+    });
+});
+
+router.post("/analytics/", (req, res) => {
+    /*
+    { Name : guest , Session key ,Timestamp , 
+        query , website , description , website title, 
+        original index, shuffled index}
+    */
+
+    const query = "INSERT INTO `link_clicks`(`id`, `username`, `sessionkey`, `timestamp`, `query`, `website`, `description`, `title`, `position`, `original_position`) \
+    VALUES (NULL,?,?,CURRENT_TIMESTAMP,?,?,?,?,?,?)";
+    const args = [req.body.username, req.body.sessionkey, req.body.query, req.body.website, req.body.description, req.body.title, req.body.position, req.body.original_position];
+
+    const connector = require('../interfaces/SqlConnector');
+    connector.query(query,args);
+
+    res.status(200).send({
+        data: "Inserted Successfully"
+    });
 });
 
 module.exports = router;

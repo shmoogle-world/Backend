@@ -1,5 +1,5 @@
 var crypto = require('crypto');
-const Connector = require('../../interfaces/SqlConnector');
+const Connector = require('../interfaces/SqlConnector');
 const ControllerInterface = require('../interfaces/ControllerInterface');
 
 const genSalt = (length) => {
@@ -18,14 +18,15 @@ class UserController extends ControllerInterface {
     static async create(req) {
         let q1 = "SELECT * FROM `users` WHERE `email` = '" + req.body.email + "'";
         let data = await Connector.query(q1);
-        if (data.length) {
+        if (data.length != 0) {
             return {
+                "bool": true,
                 "error": "User already exists"
             };
         }
         const salt = genSalt(16);
         const hash = sha512(req.body.password, salt);
-        let q2 = "INSERT INTO `users`(`id`, `email`, `display_name`, `password`, `salt`) VALUES (NULL,'" + req.body.email + "','" + req.body.displayName + "', '" + hash + "', '" + salt + "', NULL,NULL)";
+        let q2 = "INSERT INTO `users`(`id`, `email`, `display_name`, `password`, `salt`) VALUES (NULL,'" + req.body.email + "','" + req.body.displayName + "', '" + hash + "', '" + salt + "')";
         data = await Connector.query(q2);
         data = await Connector.query(q1);
         return data[0];
@@ -34,9 +35,10 @@ class UserController extends ControllerInterface {
     static async fetch(req) {
         let q1 = "SELECT * FROM `users` WHERE `email` = '" + req.body.email + "'";
         let data = await Connector.query(q1);
-        if (data.length) {
+        if (data.length == 0) {
             throw {
-                "error": "User already exists"
+                "bool": true,
+                "error": "User doesnt exists"
             };
         }
         const hash = sha512(req.body.password, data[0].salt);

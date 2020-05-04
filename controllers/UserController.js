@@ -46,6 +46,15 @@ class UserController extends ControllerInterface {
             return data[0];
         return null;
     }
+
+    static async authenticate(email) {
+        let q1 = "SELECT * FROM `users` WHERE `email` = '" + email + "'";
+        let data = await Connector.query(q1);
+        if (data.length == 0) {
+            return null;
+        }
+        return data;
+    }
 }
 
 module.exports = UserController;

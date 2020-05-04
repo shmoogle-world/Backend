@@ -2,7 +2,7 @@ const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const passport = require("passport");
+const passport = require("./middleware/passportStrategy");
 const logger = require("morgan");
 const dotenv = require('dotenv');
 dotenv.config();
@@ -13,6 +13,7 @@ const apiRouter = require("./routes/apiRoutes");
 const docs = require('./routes/DocsRoutes');
 
 const app = express();
+
 // 1 minute // 60 requests
 // return exception
 // upload to azure

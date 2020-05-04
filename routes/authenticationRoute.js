@@ -4,17 +4,17 @@ const router = express.Router();
 const authenticationMiddleware = require('../middleware/AuthenticationMiddleware');
 
 router.post('/signup', (req, res) => {
-    authenticationMiddleware.signup(req,res);
+    authenticationMiddleware.signup(req, res);
 });
 
 router.post('/login', (req, res) => {
-    authenticationMiddleware.login(req,res);
+    authenticationMiddleware.login(req, res);
 });
 
-router.post('/SomeRouteHereThatIsProtected', passport.authenticate('jwt', {
+router.post('/user', passport.authenticate('jwt', {
     session: false
 }), (req, res) => {
-    //stuff 
+    res.status(200).json({ email: req.user.email, display_name: req.user.display_name });
 });
 
 

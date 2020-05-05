@@ -16,49 +16,39 @@ const sha512 = (password, salt) => {
 
 class UserController extends ControllerInterface {
     static async create(req) {
-        try {
-            if (!req.body.email || !req.body.displayName) throw { error: "Missing variables" };
+        if (!req.body.email || !req.body.displayName) throw { status: 500, error: "Missing variables" };
 
-            const q1 = "SELECT * FROM `users` WHERE `email` = '" + req.body.email + "'";
-            const args1 = [req.body.email];
-            let data = await Connector.query(q1, args);
-            if (data.length != 0) throw { error: "User doesnt exists" };
-            const salt = genSalt(16);
-            const hash = sha512(req.body.password, salt);
-            const q2 = "INSERT INTO `users`(`id`, `email`, `display_name`, `password`, `salt`) VALUES (NULL, ?, ?, ?, ?)";
-            const args = [req.body.email, req.body.displayName, hash, salt];
-            data = await Connector.query(q2, args);
-            data = await Connector.query(q1, args1);
-            return data[0];
-        } catch (e) {
-            throw e;
-        }
+        const q1 = "SELECT * FROM `users` WHERE `email` = '" + req.body.email + "'";
+        const args1 = [req.body.email];
+        let data = await Connector.query(q1, args1);
+        if (data.length != 0) throw { status: 409, error: "EMAIL_EXISTS" };
+        const salt = genSalt(16);
+        const hash = sha512(req.body.password, salt);
+        const q2 = "INSERT INTO `users`(`id`, `email`, `display_name`, `password`, `salt`) VALUES (NULL, ?, ?, ?, ?)";
+        const args2 = [req.body.email, req.body.displayName, hash, salt];
+        data = await Connector.query(q2, args2);
+        data = await Connector.query(q1, args1);
+        return data[0];
     }
 
     static async fetch(req) {
-        try {
-            let q1 = "SELECT * FROM `users` WHERE `email` = '" + req.body.email + "'";
-            let data = await Connector.query(q1);
-            if (data.length == 0) throw { error: "User doesnt exists" };
+        const q = "SELECT * FROM `users` WHERE `email` = ?";
+        const args = [req.body.email];
+        const data = await Connector.query(q, args);
+        if (data.length == 0) throw { status: 203, error: "EMAIL_NOT_FOUND" };
 
-            const hash = sha512(req.body.password, data[0].salt);
-            if (hash === data[0].password)
-                return data[0];
-            return null;
-        } catch (e) {
-            throw e;
-        }
+        const hash = sha512(req.body.password, data[0].salt);
+        if (hash !== data[0].password) throw { status: 401, error: "INVALID_PASSWORD" };
+
+        return data[0];
     }
 
     static async authenticate(email) {
-        try {
-            let q1 = "SELECT * FROM `users` WHERE `email` = '" + email + "'";
-            let data = await Connector.query(q1);
-            if (data.length == 0) throw { error: "User doesnt exists" };
-            return data;
-        } catch (e) {
-            throw e;
-        }
+        const q = "SELECT * FROM `users` WHERE `email` = ?";
+        const args = [email];
+        const data = await Connector.query(q, args);
+        if (data.length == 0) throw { status: 401, error: "EMAIL_NOT_FOUND" };
+        return data[0];
     }
 }
 

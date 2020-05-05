@@ -12,10 +12,7 @@ opts.issuer = 'https://shmoogle.world';
 passport.use(new JwtStrategy(opts, async (payload, done) => {
     try {
         let obj = await UserController.authenticate(payload.data.email);
-        if (obj == null)
-            return done(null, false);
-        else
-            return done(null, obj);
+        return done(null, obj);
     } catch (err) {
         done(err, false);
     }

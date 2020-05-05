@@ -9,4 +9,4 @@ const genToken = (user) => {
     return jwt.sign({ data: obj }, process.env.APPSETTING_JWT_SALT, { expiresIn: 86400, issuer: 'https://shmoogle.world' }); //expiresin 1 day.
 }
 
-module.exports = {genToken};
+module.exports = { genToken };

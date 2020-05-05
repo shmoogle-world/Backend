@@ -6,9 +6,6 @@ class Authentication {
     static async signup(req, res) {
         try {
             const user = await UserController.create(req);
-            if (!user) { console.log(user.error); res.status(401).end(); return; }
-            if (user.error) { console.log(user.error); res.status(409).send(user.error); return; }
-
             const token = genToken(user);
             res.status(200).json({
                 email: user.email,
@@ -17,14 +14,15 @@ class Authentication {
             });
         } catch (e) {
             console.log(e);
-            res.json(e);
+            const status = e.status ? e.status : 500;
+            const error = e.error ? e.error : 'An Error Has Occured';
+            res.status(status).send(error);
         }
     }
 
     static async login(req, res) {
         try {
             const user = await UserController.fetch(req);
-            if (!user || user.bool || user === null) { console.log(user.error); res.status(401).end(); return; }
             const token = genToken(user);
             res.status(200).json({
                 email: user.email,
@@ -33,7 +31,9 @@ class Authentication {
             });
         } catch (e) {
             console.log(e);
-            res.json(e);
+            const status = e.status ? e.status : 500;
+            const error = e.error ? e.error : 'An Error Has Occured';
+            res.status(status).send(error);
         }
     }
 }

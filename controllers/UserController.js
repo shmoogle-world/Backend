@@ -16,31 +16,26 @@ const sha512 = (password, salt) => {
 
 class UserController extends ControllerInterface {
     static async create(req) {
-        let q1 = "SELECT * FROM `users` WHERE `email` = '" + req.body.email + "'";
-        let data = await Connector.query(q1);
-        if (data.length != 0) {
-            return {
-                "bool": true,
-                "error": "User already exists"
-            };
-        }
+        if (!req.body.email || !req.body.displayName) return { error: "Missing variables" };
+
+        const q1 = "SELECT * FROM `users` WHERE `email` = '" + req.body.email + "'";
+        const args1 = [req.body.email];
+        let data = await Connector.query(q, args);
+        if (data.length != 0) return { error: "User doesnt exists" };
         const salt = genSalt(16);
         const hash = sha512(req.body.password, salt);
-        let q2 = "INSERT INTO `users`(`id`, `email`, `display_name`, `password`, `salt`) VALUES (NULL,'" + req.body.email + "','" + req.body.displayName + "', '" + hash + "', '" + salt + "')";
-        data = await Connector.query(q2);
-        data = await Connector.query(q1);
+        const q2 = "INSERT INTO `users`(`id`, `email`, `display_name`, `password`, `salt`) VALUES (NULL, ?, ?, ?, ?)";
+        const args = [req.body.email, req.body.displayName, hash, salt];
+        data = await Connector.query(q2, args);
+        data = await Connector.query(q1, args1);
         return data[0];
     }
 
     static async fetch(req) {
         let q1 = "SELECT * FROM `users` WHERE `email` = '" + req.body.email + "'";
         let data = await Connector.query(q1);
-        if (data.length == 0) {
-            throw {
-                "bool": true,
-                "error": "User doesnt exists"
-            };
-        }
+        if (data.length == 0) return { error: "User doesnt exists" };
+
         const hash = sha512(req.body.password, data[0].salt);
         if (hash === data[0].password)
             return data[0];
@@ -50,9 +45,7 @@ class UserController extends ControllerInterface {
     static async authenticate(email) {
         let q1 = "SELECT * FROM `users` WHERE `email` = '" + email + "'";
         let data = await Connector.query(q1);
-        if (data.length == 0) {
-            return null;
-        }
+        if (data.length == 0) return { error: "User doesnt exists" };
         return data;
     }
 }

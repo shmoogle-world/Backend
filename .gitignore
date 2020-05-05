@@ -62,3 +62,5 @@ typings/
 
 client_creds.json
 sheet_ID.json
+
+.vscode

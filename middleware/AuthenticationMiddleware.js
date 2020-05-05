@@ -6,8 +6,8 @@ class Authentication {
     static async signup(req, res) {
         try {
             const user = await UserController.create(req);
-            if (!user) { res.status(401).end(); return; }
-            if (user.error) { res.status(409).send(user.error); return; }
+            if (!user) { console.log(user.error); res.status(401).end(); return; }
+            if (user.error) { console.log(user.error); res.status(409).send(user.error); return; }
 
             const token = genToken(user);
             res.status(200).json({
@@ -24,7 +24,7 @@ class Authentication {
     static async login(req, res) {
         try {
             const user = await UserController.fetch(req);
-            if (!user || user.bool || user === null) { res.status(401).end(); return; }
+            if (!user || user.bool || user === null) { console.log(user.error); res.status(401).end(); return; }
             const token = genToken(user);
             res.status(200).json({
                 email: user.email,

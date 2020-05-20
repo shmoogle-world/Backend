@@ -48,12 +48,17 @@ class BoardSearch extends ControllerInterface {
     };
 
     static async updateAll(id, items) {
-        let q = 'UPDATE board_search SET list_index = (case ';
+
+        const q = 'INSERT INTO `board_search` ( board_id, search_id, list_index, created_at) \
+        VALUES ? \
+        ON DUPLICATE KEY UPDATE list_index = VALUES(list_index)';
+
+        let s = '';
         items.forEach(item => {
-            q += `when search_id = ${item.id} then ${item.list_index} `;
+            s += `(${item.board_id},${item.search_id},${list_index},${created_at}),`
         });
-        q += 'end) WHERE board_id = ?'
-        const args = [id];
+
+        const args = [s, id];
         return await Connector.query(q, args);
     };
 

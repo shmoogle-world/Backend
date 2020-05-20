@@ -11,7 +11,6 @@ class SwaggerController {
     index(req, res) {
         const path = require('path');
         const viewsDir = path.join(__dirname, '../views/docs/');
-        res.writeHead(200, {'Content-Type': 'text/html'});
         res.sendFile(viewsDir + 'index.html');
     }
 

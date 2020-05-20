@@ -8,7 +8,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const indexRouter = require("./routes/indexRouter");
-const authenticationRouter = require('./routes/authenticationRoute');
 const apiRouter = require("./routes/apiRoutes");
 const docs = require('./routes/DocsRoutes');
 
@@ -68,7 +67,6 @@ app.use((req, res, next) => {
 });
 
 app.use("/", indexRouter);
-app.use("/", authenticationRouter);
 app.use('/docs/', docs);
 app.use("/api", apiRouter);
 

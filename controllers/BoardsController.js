@@ -6,7 +6,7 @@ const { genToken } = require('../utilities/tokenGenerator');
 class UserController extends ControllerInterface {
     static async fetchAll(req, res) {
         try {
-            const q = "SELECT * FROM `boards` WHERE `user_id` = ? " + req.params.id !== req.user.id ? " AND public = 1" : "";
+            const q = "SELECT * FROM `boards` WHERE `user_id` = ? " + req.params.user_id !== req.user.id ? " AND public = 1" : "";
             const args = [req.params.id];
             const token = genToken(req.user);
             const data = await Connector.query(q, args);

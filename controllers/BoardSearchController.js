@@ -12,7 +12,7 @@ class BoardSearch extends ControllerInterface {
 
     static async create(req, res) {
         try {
-            if (!req.body.board_id || !req.body.title || !req.body.url || !req.body.last_crawled) res.status(409).send('Error missing parameters');
+            if (!req.body.title || !req.body.url || !req.body.last_crawled) res.status(409).send('Error missing parameters');
             let q = "INSERT INTO `searches` (`id`, `title`, `url`, `snippet`, `preview_image`, `last_crawled`) VALUES (NULL, ?, ?, ?, ?, ?)";
             let args = [
                 req.body.title,
@@ -30,13 +30,13 @@ class BoardSearch extends ControllerInterface {
             if (id.length == 0) throw { "error": "ERROR IN BACKEND OCCURED" };
 
             q = "SELECT COUNT(`board_id`) FROM board_search WHERE board_id = ?";
-            args = [req.body.board_id];
+            args = [req.params.id];
             const index = await Connector.query(q, args);
 
             if (id.length == 0) throw { "error": "ERROR IN BACKEND OCCURED" };
 
             q = "INSERT INTO `board_search` ( board_id, search_id, list_index, created_at) VALUES ( ?, ?, ?, NULL)";
-            args = [req.body.board_id, id[0].id, index[0]];
+            args = [req.params.id, id[0].id, index[0]['COUNT(`board_id`)'] + 1];
             await Connector.query(q, args);
 
             const token = genToken(req.user);
@@ -48,13 +48,19 @@ class BoardSearch extends ControllerInterface {
     };
 
     static async updateAll(id, items) {
-
+        let q = 'UPDATE board_search SET list_index = (case ';
+        items.forEach(item => {
+            q += `when search_id = ${item.id} then ${item.list_index} `;
+        });
+        q += 'end) WHERE board_id = ?'
+        const args = [id];
+        return await Connector.query(q, args);
     };
 
     static async delete(req, res) {
         try {
             let q = "SELECT * FROM `board_search` WHERE `board_id` = ? AND `search_id` = ?";
-            const args = [req.params.board_id, req.params, req.params.search_id];
+            const args = [req.params.id, req.params.search_id];
             const data = await Connector.query(q, args);
             if (data.length == 0) { res.status(203).send('No Content'); return; }
 
@@ -68,14 +74,6 @@ class BoardSearch extends ControllerInterface {
             res.status(500).json({ message: "Error occured", error: e });
         }
     };
-
-    static async test(req, res) {
-        const q = "SELECT COUNT(`board_id`) FROM board_search WHERE board_id = 1";
-        const index = await Connector.query(q);
-        console.log(index);
-        console.log(index[0]);
-        res.send("cool");
-    }
 }
 
 module.exports = BoardSearch;

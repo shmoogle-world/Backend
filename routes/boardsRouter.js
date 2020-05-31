@@ -5,7 +5,7 @@ const boardSearchRouter = require('./boardSearchRouter');
 const BoardController = require("../controllers/BoardsController");
 const BoardSearchController = require('../controllers/BoardSearchController');
 
-router.use('/board/:id', boardSearchRouter);
+router.use('/board/:id/search', boardSearchRouter);
 
 router.get('/boards/:user_id', passport.authenticate('jwt', { session: false }), (req, res) => {
     BoardController.fetchAll(req, res);

@@ -66,7 +66,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use("/", indexRouter);
+app.use(indexRouter);
 app.use('/docs/', docs);
 app.use("/api", apiRouter);
 

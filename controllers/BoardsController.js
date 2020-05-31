@@ -6,7 +6,8 @@ const { genToken } = require('../utilities/tokenGenerator');
 class UserController extends ControllerInterface {
     static async fetchAll(req, res) {
         try {
-            const q = "SELECT * FROM `boards` WHERE `user_id` = ? " + req.params.user_id !== req.user.id ? " AND public = 1" : "";
+            let q = "SELECT * FROM `boards` WHERE `user_id` = ? ";
+            req.params.user_id !== req.user.id ? q += " AND public = 1" : q;
             const args = [req.params.id];
             const token = genToken(req.user);
             const data = await Connector.query(q, args);
@@ -88,7 +89,7 @@ class UserController extends ControllerInterface {
 
             await Connector.query(q, args);
             if (req.body.items)
-                await BoardSearch.updateSearches(req.params.id, req.body.items);
+                await BoardSearch.updateSearches(req.body.items);
 
             const token = genToken(req.user);
             res.status(200).json({ data: 'Successfully updated', jwt: token });

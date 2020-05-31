@@ -3,7 +3,7 @@ const passport = require("passport");
 const router = express.Router();
 const BoardController = require("../controllers/BoardsController");
 
-router.post('/:search_id', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.post('/', passport.authenticate('jwt', { session: false }), (req, res) => {
     BoardController.create(req, res);
 });
 

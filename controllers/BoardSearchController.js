@@ -4,7 +4,7 @@ const ControllerInterface = require('../interfaces/ControllerInterface');
 class BoardSearch extends ControllerInterface {
     static async fetchAll(id) {
         const q = 'SELECT searches.id, searches.title, searches.url, searches.snippet, searches.preview_image, \
-            searches.dateLastCrawled, board_search.list_index, board_search.created_at \
+            searches.last_crawled, board_search.list_index, board_search.created_at \
             FROM ( board_search INNER JOIN searches ON board_search.search_id = searches.id ) WHERE board_search.board_id = ? ORDER BY board_search.list_index';
         const args = [id];
         return await Connector.query(q, args);
@@ -40,14 +40,14 @@ class BoardSearch extends ControllerInterface {
             await Connector.query(q, args);
 
             const token = genToken(req.user);
-            res.status(200).json({ data: 'Successfully deleted', jwt: token });
+            res.status(200).json({ data: 'Successfully inserted', jwt: token });
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });
         }
     };
 
-    static async updateAll(id, items) {
+    static async updateSearches(items) {
 
         const q = 'INSERT INTO `board_search` ( board_id, search_id, list_index, created_at) \
         VALUES ? \
@@ -58,7 +58,7 @@ class BoardSearch extends ControllerInterface {
             s += `(${item.board_id},${item.search_id},${list_index},${created_at}),`
         });
 
-        const args = [s, id];
+        const args = [s];
         return await Connector.query(q, args);
     };
 

@@ -8,6 +8,7 @@ class Authentication {
             const user = await UserController.create(req);
             const token = genToken(user);
             res.status(200).json({
+                id: user.id,
                 email: user.email,
                 displayName: user.display_name,
                 jwt: token
@@ -25,6 +26,7 @@ class Authentication {
             const user = await UserController.fetch(req);
             const token = genToken(user);
             res.status(200).json({
+                id: user.id,
                 email: user.email,
                 displayName: user.display_name,
                 jwt: token

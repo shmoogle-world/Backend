@@ -6,12 +6,11 @@ const { genToken } = require('../utilities/tokenGenerator');
 class UserController extends ControllerInterface {
     static async fetchAll(req, res) {
         try {
-            let q = "SELECT * FROM `boards` WHERE `user_id` = ? ";
+            let q = "SELECT *, (SELECT COUNT(*) FROM board_search WHERE board_id = t.id ) AS itemCount FROM boards t WHERE user_id = ?";
             req.params.user_id !== req.user.id ? q += " AND public = 1" : q;
-            const args = [req.params.id];
-            const token = genToken(req.user);
+            const args = [req.params.user_id];
             const data = await Connector.query(q, args);
-            res.status(200).json({ data: data, jwt: token });
+            res.status(200).json(data);
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });
@@ -26,9 +25,8 @@ class UserController extends ControllerInterface {
             if (data.length == 0) { res.status(203).send('No Content'); return; }
             if (data[0].public === 0 && req.params.id !== data[0].user_id) res.status(401).send('Unauthorized Access');
             data = data[0];
-            const token = genToken(req.user);
             data.items = await BoardSearch.fetchAll(req.params.id);
-            res.status(200).json({ data: data, jwt: token });
+            res.status(200).json(data);
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });
@@ -47,8 +45,7 @@ class UserController extends ControllerInterface {
             q = "DELETE FROM `board_search` WHERE `board_id` = ?"
             await Connector.query(q, args);
 
-            const token = genToken(req.user);
-            res.status(200).json({ data: 'Successfully deleted', jwt: token });
+            res.status(200).send('Successfully deleted');
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });
@@ -61,8 +58,7 @@ class UserController extends ControllerInterface {
             const q = "INSERT INTO `boards` (`id`, `user_id`, `title`, `description`, `public`, `view_count`, `created_at`) VALUES (NULL, ?, ?, ?, NULL, NULL, NULL)";
             const args = [req.body.userId, req.body.title, req.body.description ? req.body.description : ''];
             await Connector.query(q, args);
-            const token = genToken(req.user);
-            res.status(200).json({ data: 'Successfully deleted', jwt: token });
+            res.status(200).send('Successfully deleted');
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });
@@ -91,8 +87,7 @@ class UserController extends ControllerInterface {
             if (req.body.items)
                 await BoardSearch.updateSearches(req.body.items);
 
-            const token = genToken(req.user);
-            res.status(200).json({ data: 'Successfully updated', jwt: token });
+            res.status(200).send('Successfully updated');
 
         } catch (e) {
             console.log(e);

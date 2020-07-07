@@ -39,8 +39,7 @@ class BoardSearch extends ControllerInterface {
             args = [req.params.id, id[0].id, index[0]['COUNT(`board_id`)'] + 1];
             await Connector.query(q, args);
 
-            const token = genToken(req.user);
-            res.status(200).json({ data: 'Successfully inserted', jwt: token });
+            res.status(200).send('Successfully inserted');
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });
@@ -72,8 +71,7 @@ class BoardSearch extends ControllerInterface {
             q = "DELETE FROM `board_search` WHERE `board_id` = ? AND `search_id` = ?"
             await Connector.query(q, args);
 
-            const token = genToken(req.user);
-            res.status(200).json({ data: 'Successfully deleted', jwt: token });
+            res.status(200).send('Successfully deleted');
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });

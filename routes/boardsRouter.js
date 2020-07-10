@@ -3,7 +3,6 @@ const passport = require("passport");
 const router = express.Router();
 const boardSearchRouter = require('./boardSearchRouter');
 const BoardController = require("../controllers/BoardsController");
-const BoardSearchController = require('../controllers/BoardSearchController');
 
 router.use('/board/:id/search', boardSearchRouter);
 

@@ -10,34 +10,40 @@ class BoardSearch extends ControllerInterface {
         return await Connector.query(q, args);
     };
 
+    static async createSearch(boardID, title, url, snippet, preview_image, last_crawled) {
+        let q = "INSERT INTO `searches` (`id`, `title`, `url`, `snippet`, `preview_image`, `last_crawled`) VALUES (NULL, ?, ?, ?, ?, ?)";
+        let args = [
+            title,
+            url,
+            snippet,
+            preview_image,
+            last_crawled
+        ];
+
+        const response = await Connector.query(q, args);
+        if (!response.insertId == 0) throw { "error": "ERROR IN BACKEND OCCURED" };
+
+        q = "SELECT COUNT(`board_id`) FROM board_search WHERE board_id = ?";
+        args = [boardID];
+        const index = await Connector.query(q, args);
+
+        q = "INSERT INTO `board_search` ( board_id, search_id, list_index, created_at) VALUES ( ?, ?, ?, NULL)";
+        args = [boardID, searchID[0].id, index[0]['COUNT(`board_id`)'] + 1];
+        await Connector.query(q, args);
+    }
+
     static async create(req, res) {
         try {
             if (!req.body.title || !req.body.url || !req.body.last_crawled) res.status(409).send('Error missing parameters');
-            let q = "INSERT INTO `searches` (`id`, `title`, `url`, `snippet`, `preview_image`, `last_crawled`) VALUES (NULL, ?, ?, ?, ?, ?)";
-            let args = [
+
+            await this.createSearch(
+                req.params.id,
                 req.body.title,
                 req.body.url,
                 req.body.snippet ? req.body.snippet : '',
                 req.body.preview_image ? req.body.preview_image : '',
                 req.body.last_crawled
-            ];
-
-            await Connector.query(q, args);
-
-            q = "SELECT id FROM searches WHERE url = ?";
-            args = [req.body.url];
-            const id = await Connector.query(q, args);
-            if (id.length == 0) throw { "error": "ERROR IN BACKEND OCCURED" };
-
-            q = "SELECT COUNT(`board_id`) FROM board_search WHERE board_id = ?";
-            args = [req.params.id];
-            const index = await Connector.query(q, args);
-
-            if (id.length == 0) throw { "error": "ERROR IN BACKEND OCCURED" };
-
-            q = "INSERT INTO `board_search` ( board_id, search_id, list_index, created_at) VALUES ( ?, ?, ?, NULL)";
-            args = [req.params.id, id[0].id, index[0]['COUNT(`board_id`)'] + 1];
-            await Connector.query(q, args);
+            );
 
             res.status(200).send('Successfully inserted');
         } catch (e) {

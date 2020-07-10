@@ -55,10 +55,21 @@ class UserController extends ControllerInterface {
     static async create(req, res) {
         try {
             if (!req.body.userId || !req.body.title) res.status(409).send('Error missing parameters');
-            const q = "INSERT INTO `boards` (`id`, `user_id`, `title`, `description`, `public`, `view_count`, `created_at`) VALUES (NULL, ?, ?, ?, NULL, NULL, NULL)";
-            const args = [req.body.userId, req.body.title, req.body.description ? req.body.description : ''];
-            await Connector.query(q, args);
-            res.status(200).send('Successfully deleted');
+            const q = "INSERT INTO `boards` (`id`, `user_id`, `title`, `description`, `public`, `view_count`, `created_at`) VALUES (NULL, ?, ?, ?, ?, 0, NULL)";
+            const args = [req.body.userId, req.body.title, req.body.description ? req.body.description : '', req.body.public ? req.body.public : 1];
+            const response = await Connector.query(q, args);
+
+            if(req.body.item){
+                await BoardSearch.createSearch(
+                    response.insertId,
+                    req.body.title,
+                    req.body.url,
+                    req.body.snippet ? req.body.snippet : '',
+                    req.body.preview_image ? req.body.preview_image : '',
+                    req.body.last_crawled
+                );
+            }
+            res.status(200).send('Successfully inserted');
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });

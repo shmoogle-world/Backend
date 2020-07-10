@@ -59,7 +59,7 @@ class UserController extends ControllerInterface {
             const args = [req.body.userId, req.body.title, req.body.description ? req.body.description : '', req.body.public ? req.body.public : 1];
             const response = await Connector.query(q, args);
 
-            if(req.body.item){
+            if (req.body.item) {
                 await BoardSearch.createSearch(
                     response.insertId,
                     req.body.title,

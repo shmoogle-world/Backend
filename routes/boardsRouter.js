@@ -1,10 +1,16 @@
 const express = require("express");
 const passport = require("passport");
 const router = express.Router();
-const boardSearchRouter = require('./boardSearchRouter');
 const BoardController = require("../controllers/BoardsController");
+const BoardSearchController = require('../controllers/BoardSearchController');
 
-router.use('/board/:id/search', boardSearchRouter);
+router.post('/board/:id/search/', passport.authenticate('jwt', { session: false }), (req, res) => {
+    BoardSearchController.create(req, res);
+});
+
+router.delete('/board/:id/search/:search_id', passport.authenticate('jwt', { session: false }), (req, res) => {
+    BoardSearchController.remove(req, res);
+});
 
 router.get('/boards/:user_id', passport.authenticate('jwt', { session: false }), (req, res) => {
     BoardController.fetchAll(req, res);

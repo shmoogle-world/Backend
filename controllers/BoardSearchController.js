@@ -11,7 +11,8 @@ class BoardSearch extends ControllerInterface {
     };
 
     static async createSearch(boardID, title, url, snippet, preview_image, last_crawled) {
-        let q = "INSERT INTO `searches` (`id`, `title`, `url`, `snippet`, `preview_image`, `last_crawled`) VALUES (NULL, ?, ?, ?, ?, ?)";
+
+        let q = "INSERT INTO `searches` (`id`, `title`, `url`, `snippet`, `preview_image`, `last_crawled`) VALUES (NULL, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `last_crawled` = VALUES(last_crawled) ";
         let args = [
             title,
             url,
@@ -21,21 +22,21 @@ class BoardSearch extends ControllerInterface {
         ];
 
         const response = await Connector.query(q, args);
-        if (!response.insertId == 0) throw { "error": "ERROR IN BACKEND OCCURED" };
+        if (!response.insertId) throw { "error": "ERROR IN BACKEND OCCURED" };
 
-        q = "SELECT COUNT(`board_id`) FROM board_search WHERE board_id = ?";
+        q = "SELECT COUNT(`board_id`) as countIndex FROM board_search WHERE board_id = ?";
         args = [boardID];
         const index = await Connector.query(q, args);
 
         q = "INSERT INTO `board_search` ( board_id, search_id, list_index, created_at) VALUES ( ?, ?, ?, NULL)";
-        args = [boardID, searchID[0].id, index[0]['COUNT(`board_id`)'] + 1];
+        args = [boardID, response.insertId, index[0].countIndex + 1];
+
         await Connector.query(q, args);
     }
 
     static async create(req, res) {
         try {
             if (!req.body.title || !req.body.url || !req.body.last_crawled) res.status(409).send('Error missing parameters');
-
             await this.createSearch(
                 req.params.id,
                 req.body.title,

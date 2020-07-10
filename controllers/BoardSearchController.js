@@ -37,6 +37,7 @@ class BoardSearch extends ControllerInterface {
     static async create(req, res) {
         try {
             if (!req.body.title || !req.body.url || !req.body.last_crawled) res.status(409).send('Error missing parameters');
+            
             await this.createSearch(
                 req.params.id,
                 req.body.title,
@@ -46,7 +47,7 @@ class BoardSearch extends ControllerInterface {
                 req.body.last_crawled
             );
 
-            res.status(200).send('Successfully inserted');
+            res.status(200).send({ message: 'Successfully Inserted' });
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });
@@ -78,7 +79,7 @@ class BoardSearch extends ControllerInterface {
             q = "DELETE FROM `board_search` WHERE `board_id` = ? AND `search_id` = ?"
             await Connector.query(q, args);
 
-            res.status(200).send('Successfully deleted');
+            res.status(200).send({ message: 'Successfully deleted' });
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });

@@ -45,7 +45,7 @@ class UserController extends ControllerInterface {
             q = "DELETE FROM `board_search` WHERE `board_id` = ?"
             await Connector.query(q, args);
 
-            res.status(200).send('Successfully deleted');
+            res.status(200).send({ message: 'Successfully deleted' });
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });
@@ -69,7 +69,7 @@ class UserController extends ControllerInterface {
                     req.body.last_crawled
                 );
             }
-            res.status(200).send('Successfully inserted');
+            res.status(200).send({ message: 'Successfully inserted' });
         } catch (e) {
             console.log(e);
             res.status(500).json({ message: "Error occured", error: e });
@@ -98,7 +98,7 @@ class UserController extends ControllerInterface {
             if (req.body.items)
                 await BoardSearch.updateSearches(req.body.items);
 
-            res.status(200).send('Successfully updated');
+            res.status(200).send({ message: 'Successfully updated' });
 
         } catch (e) {
             console.log(e);

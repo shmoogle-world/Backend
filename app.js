@@ -2,13 +2,13 @@ const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const passport = require("./middleware/passportStrategy");
 const logger = require("morgan");
 const dotenv = require('dotenv');
 dotenv.config();
 
+const passport = require("./middleware/passportStrategy");
+
 const indexRouter = require("./routes/indexRouter");
-const authenticationRouter = require('./routes/authenticationRoute');
 const apiRouter = require("./routes/apiRoutes");
 const docs = require('./routes/DocsRoutes');
 
@@ -67,8 +67,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use("/", indexRouter);
-app.use("/", authenticationRouter);
+app.use(indexRouter);
 app.use('/docs/', docs);
 app.use("/api", apiRouter);
 

@@ -8,6 +8,7 @@ class Authentication {
             const user = await UserController.create(req);
             const token = genToken(user);
             res.status(200).json({
+                id: user.id,
                 email: user.email,
                 displayName: user.display_name,
                 jwt: token
@@ -25,6 +26,24 @@ class Authentication {
             const user = await UserController.fetch(req);
             const token = genToken(user);
             res.status(200).json({
+                id: user.id,
+                email: user.email,
+                displayName: user.display_name,
+                jwt: token
+            });
+        } catch (e) {
+            console.log(e);
+            const status = e.status ? e.status : 500;
+            const error = e.error ? e.error : 'An Error Has Occured';
+            res.status(status).send(error);
+        }
+    }
+
+    static async refresh(req, res) {
+        try {
+            const token = genToken(req.user);
+            res.status(200).json({
+                id: user.id,
                 email: user.email,
                 displayName: user.display_name,
                 jwt: token
